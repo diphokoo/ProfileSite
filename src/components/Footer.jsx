@@ -3,9 +3,8 @@ import { FiGithub, FiLinkedin, FiTwitter, FiMail } from 'react-icons/fi'
 
 const navLinks = ['About', 'Skills', 'Experience', 'Projects', 'Services', 'Contact']
 const socials = [
-  { icon: <FiGithub />, href: 'https://github.com', label: 'GitHub' },
-  { icon: <FiLinkedin />, href: 'https://linkedin.com', label: 'LinkedIn' },
-  { icon: <FiTwitter />, href: 'https://twitter.com', label: 'Twitter' },
+  { icon: <FiGithub />, href: 'https://github.com/diphokoo', label: 'GitHub' },
+  { icon: <FiLinkedin />, href: 'https://www.linkedin.com/in/obakeng-diphoko-208305146/', label: 'LinkedIn' },
   { icon: <FiMail />, href: 'mailto:Diphokoo@outlook.com', label: 'Email' },
 ]
 
