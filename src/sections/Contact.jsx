@@ -1,7 +1,20 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { FiMail, FiMapPin, FiSend } from 'react-icons/fi'
+import emailjs from '@emailjs/browser'
+import { FiMail, FiMapPin, FiSend, FiLoader } from 'react-icons/fi'
 import SectionTitle from '../components/SectionTitle'
+
+// ─── EmailJS config ───────────────────────────────────────────────────────────
+// 1. Sign up free at https://www.emailjs.com
+// 2. Create a service (Gmail / Outlook) and note the Service ID
+// 3. Create an email template — use variables: {{from_name}}, {{from_email}},
+//    {{company}}, {{project_type}}, {{message}} — set "To Email" to diphokoo@outlook.com
+// 4. Copy your Public Key from Account → API Keys
+// Replace the three placeholder strings below with your real values:
+const EMAILJS_SERVICE_ID  = 'service_n7932jn'
+const EMAILJS_TEMPLATE_ID = 'template_xdw87db'
+const EMAILJS_PUBLIC_KEY  = '2yM2yr5JvroZB-8_j'
+// ─────────────────────────────────────────────────────────────────────────────
 
 const projectTypes = [
   'Web Application',
@@ -12,18 +25,48 @@ const projectTypes = [
   'Other',
 ]
 
+const INITIAL = { name: '', email: '', company: '', projectType: '', message: '' }
+
 export default function Contact() {
-  const [form, setForm] = useState({ name: '', email: '', company: '', projectType: '', message: '' })
-  const [sent, setSent] = useState(false)
+  const formRef = useRef(null)
+  const [form, setForm]     = useState(INITIAL)
+  const [status, setStatus] = useState('idle') // idle | sending | success | error
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value })
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // Hook up to backend/email service as needed
-    setSent(true)
-    setTimeout(() => setSent(false), 4000)
-    setForm({ name: '', email: '', company: '', projectType: '', message: '' })
+    setStatus('sending')
+
+    try {
+      await emailjs.sendForm(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        formRef.current,
+        EMAILJS_PUBLIC_KEY
+      )
+      setStatus('success')
+      setForm(INITIAL)
+    } catch (err) {
+      console.error('EmailJS error:', err)
+      setStatus('error')
+    }
+
+    setTimeout(() => setStatus('idle'), 5000)
+  }
+
+  const btnLabel = {
+    idle:    <><FiSend /> Send Message</>,
+    sending: <><FiLoader className="animate-spin" /> Sending…</>,
+    success: <>✓ Message Sent!</>,
+    error:   <>✕ Failed — Try Again</>,
+  }
+
+  const btnClass = {
+    idle:    'btn-primary',
+    sending: 'btn-primary opacity-70 cursor-not-allowed',
+    success: 'w-full py-3 px-8 bg-emerald-600 text-white font-semibold tracking-wider uppercase text-sm flex items-center justify-center gap-2',
+    error:   'w-full py-3 px-8 bg-red-700 text-white font-semibold tracking-wider uppercase text-sm flex items-center justify-center gap-2',
   }
 
   return (
@@ -75,9 +118,7 @@ export default function Contact() {
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                 <span className="text-white text-sm">Open to new projects</span>
               </div>
-              <p className="text-gray-400 text-sm mt-2">
-                Typically responds within 24 hours
-              </p>
+              <p className="text-gray-400 text-sm mt-2">Typically responds within 24 hours</p>
             </div>
           </motion.div>
 
@@ -89,28 +130,28 @@ export default function Contact() {
             transition={{ duration: 0.6 }}
             className="lg:col-span-3"
           >
-            <form onSubmit={handleSubmit} className="glass-card p-8 space-y-5">
+            <form ref={formRef} onSubmit={handleSubmit} className="glass-card p-8 space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
                   <label className="block text-gray-400 text-xs tracking-widest uppercase mb-2">Name *</label>
                   <input
                     type="text"
-                    name="name"
+                    name="from_name"
                     required
                     value={form.name}
-                    onChange={handleChange}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
                     placeholder="Your name"
                     className="w-full bg-white/5 border border-white/10 text-white placeholder-gray-600 px-4 py-3 text-sm focus:outline-none focus:border-gold/50 transition-colors duration-300"
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-400 text-xs tracking-widest uppercase mb-2">Email *</label>
+                  <label className="block text-gray-400 text-xs tracking-widests uppercase mb-2">Email *</label>
                   <input
                     type="email"
-                    name="email"
+                    name="from_email"
                     required
                     value={form.email}
-                    onChange={handleChange}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
                     placeholder="your@email.com"
                     className="w-full bg-white/5 border border-white/10 text-white placeholder-gray-600 px-4 py-3 text-sm focus:outline-none focus:border-gold/50 transition-colors duration-300"
                   />
@@ -124,7 +165,7 @@ export default function Contact() {
                     type="text"
                     name="company"
                     value={form.company}
-                    onChange={handleChange}
+                    onChange={(e) => setForm({ ...form, company: e.target.value })}
                     placeholder="Your company"
                     className="w-full bg-white/5 border border-white/10 text-white placeholder-gray-600 px-4 py-3 text-sm focus:outline-none focus:border-gold/50 transition-colors duration-300"
                   />
@@ -132,9 +173,9 @@ export default function Contact() {
                 <div>
                   <label className="block text-gray-400 text-xs tracking-widest uppercase mb-2">Project Type</label>
                   <select
-                    name="projectType"
+                    name="project_type"
                     value={form.projectType}
-                    onChange={handleChange}
+                    onChange={(e) => setForm({ ...form, projectType: e.target.value })}
                     className="w-full bg-dark-3 border border-white/10 text-gray-300 px-4 py-3 text-sm focus:outline-none focus:border-gold/50 transition-colors duration-300"
                   >
                     <option value="">Select type</option>
@@ -152,7 +193,7 @@ export default function Contact() {
                   required
                   rows={5}
                   value={form.message}
-                  onChange={handleChange}
+                  onChange={(e) => setForm({ ...form, message: e.target.value })}
                   placeholder="Tell me about your project..."
                   className="w-full bg-white/5 border border-white/10 text-white placeholder-gray-600 px-4 py-3 text-sm focus:outline-none focus:border-gold/50 transition-colors duration-300 resize-none"
                 />
@@ -160,15 +201,10 @@ export default function Contact() {
 
               <button
                 type="submit"
-                className="w-full btn-primary flex items-center justify-center gap-2"
+                disabled={status === 'sending'}
+                className={`w-full flex items-center justify-center gap-2 transition-all duration-300 ${btnClass[status]}`}
               >
-                {sent ? (
-                  '✓ Message Sent!'
-                ) : (
-                  <>
-                    <FiSend /> Send Message
-                  </>
-                )}
+                {btnLabel[status]}
               </button>
             </form>
           </motion.div>
