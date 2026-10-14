@@ -31,6 +31,33 @@ const projects = [
     tags: ['React.js', 'E-Commerce', 'Firebase', 'UI/UX'],
     gradient: 'from-gold/20 to-amber-600/10',
   },
+  {
+    title: 'NightIQ',
+    description:
+      'Sleek nightlife and entertainment platform delivering smart venue discovery and event experiences with a modern UI.',
+    url: 'https://nightiq.netlify.app/',
+    status: 'Completed',
+    tags: ['React.js', 'UI/UX', 'Entertainment', 'Responsive'],
+    gradient: 'from-violet-600/20 to-indigo-600/10',
+  },
+  {
+    title: 'Wits Skills Lab',
+    description:
+      'Educational platform for the Wits Skills Lab, enabling students to explore courses, resources, and learning opportunities.',
+    url: 'https://witsskillslab.netlify.app/',
+    status: 'Completed',
+    tags: ['React.js', 'Education', 'UI/UX', 'Responsive'],
+    gradient: 'from-sky-600/20 to-cyan-600/10',
+  },
+  {
+    title: 'Aquamarine App',
+    description:
+      'Modern web application with a clean aquamarine aesthetic, showcasing polished UI design and smooth user interactions.',
+    url: 'https://aquamarine-dusk-5b3f77.netlify.app/#',
+    status: 'Completed',
+    tags: ['React.js', 'UI/UX', 'Design', 'Responsive'],
+    gradient: 'from-teal-600/20 to-emerald-600/10',
+  },
 ]
 
 export default function Projects() {
